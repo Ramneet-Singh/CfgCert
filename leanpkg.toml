@@ -1,0 +1,8 @@
+[package]
+name = "CfgCert"
+version = "0.1"
+lean_version = "leanprover-community/lean:3.50.3"
+path = "src"
+
+[dependencies]
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "f1e061e3caef3022f0daa99d670ecf2c30e0b5c6"}
