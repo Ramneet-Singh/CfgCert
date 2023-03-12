@@ -7,7 +7,7 @@ inductive Symbol (NT : Type) (T : Type) : Type
 | NonTerminal : NT → Symbol  
 
 structure CFG (NT : Type) (T : Type) :=
-(rules : list (NT × list (Symbol NT T)))
+(rules : set (NT × list (Symbol NT T)))
 (start : NT)
 
 variables {NT T : Type}
@@ -34,20 +34,10 @@ def liftWordToSf (w : list T) (NT : Type) : list (Symbol NT T) :=
 def CFG_Generates (g : CFG NT T) (w : list T) : Prop :=
   CFG_Derives (g) ([ Symbol.NonTerminal g.start ]) (liftWordToSf w NT)
 
-def RuleNonTerms (r : NT × list (Symbol NT T)) : list NT :=
-  list.foldl
-    (λ (l : list NT) (X : Symbol NT T),
-      match X with
-        Symbol.Terminal a := l
-      | Symbol.NonTerminal A := l ++ [A]
-      end
-    )
-    [ r.fst ]
-    r.snd
+def RuleNonTerms (r : NT × list (Symbol NT T)) : NT → Prop :=
+  λ A : NT,
+  r.fst = A ∨ (Symbol.NonTerminal A) ∈ r.snd
 
-def CFG_NonTerms (g : CFG NT T) : list NT :=
-  list.foldl
-    (λ (l : list NT) (r : NT × list (Symbol NT T)), 
-      l ++ (RuleNonTerms r)
-    )
-    [ g.start ] g.rules 
+def CFG_NonTerms (g : CFG NT T) : NT → Prop :=
+  λ A : NT,
+  A = g.start ∨ ∃ r : NT × list (Symbol NT T), r ∈ g.rules ∧ RuleNonTerms r A
